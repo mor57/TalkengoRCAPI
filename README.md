@@ -1,8 +1,8 @@
 # TalkengoRCAPI
 
-# Resource Center API Manager with native English speakers and learning English easily and natuarlly. 
+## Resource Center API Manager with native English speakers and learning English easily and natuarlly. 
 
-# Nodejs with Express, RestAPI, MongoDB, passport-jwt(Json web token), Passport, multer, bcryptjs, 
+> Nodejs with Express, RestAPI, MongoDB, passport-jwt(Json web token), Passport, multer, bcryptjs. 
 
 > Starter template for projects that use Nodejs, ES6 Javascript. This project contains configuration for development and production deploy using webpack 4 module bundler and tools which _might_ be helpful
 
