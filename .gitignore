@@ -1,0 +1,40 @@
+# recorded videos
+resources/recorded_videos/
+
+# ignore .DS_Store
+.DS_Store
+
+# git-workflow
+git-workflow
+
+# ignore local webstorm files
+.idea
+
+# ignore node_modules folder
+node_modules
+
+# ignore upload folder commit
+resources/uploaded
+
+# ignore package-lock.json
+package-lock.json
+
+# ignore language-resources (.json) files
+resources/locales/languages/*.json
+resources/reports/
+.vscode
+dist
+webpack/build.json
+backend/definitions/**/*.js
+backend/definitions/**/*.js.map
+backend/definitions/**/*.d.ts
+backend/servers/**/*.js
+backend/servers/**/*.js.map
+backend/servers/**/*.d.ts
+backend/servers/externals/task-scheduler
+backend/servers/externals/budget-management
+*.zip
+backend/process.js
+backend/process.js.map
+backend/process.d.ts
+backend/package/
