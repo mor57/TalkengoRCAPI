@@ -1,6 +1,6 @@
 # TalkengoRCAPI
 
-## Resource Center API Manager with native English speakers and learning English easily and natuarlly. 
+## Resource Center API Manager for native English speakers and learning English easily and natuarlly. 
 
 > Nodejs with Express, RestAPI, MongoDB, passport-jwt(Json web token), Passport, multer, bcryptjs. 
 
