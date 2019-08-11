@@ -226,16 +226,17 @@ exports.delete = (req, res) => {
   rc_resource
     .findById(req.params.resourceId).then(resource_del => {
       if (resource_del.trashstatus == 1) {
-        rc_resource
-          .findOneAndDelete(req.params.resourceId)
-          .then(rc_resource => {
-            if (!rc_resource) {
-              return res.status(404).send({
-                message: "resource not found with id " + req.params.Id
-              });
-            }
-            res.send({ message: "resource deleted successfully!" });
-          })
+        cat_del.remove().then(res1 => {
+          if (!res1) {
+            // rc_resource
+            //   .findOneAndDelete(req.params.resourceId)
+            // .then(rc_resource => {
+            return res.status(404).send({
+              message: "resource not found with id " + req.params.Id
+            });
+          }
+          res.send({ message: "resource deleted successfully!" });
+        })
           .catch(err => {
             if (err.kind === "ObjectId" || err.name === "NotFound") {
               return res.status(404).send({
