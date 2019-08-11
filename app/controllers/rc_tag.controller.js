@@ -104,56 +104,76 @@ exports.update = (req, res) => {
     });
   }
   // Find rc_tag and update it with the request body
-  rc_tag
-    .findByIdAndUpdate(
-      req.params.tagId,
-      {
-        tagtitle: req.body.tagtitle || "Untitled tag",
-        priority: req.body.priority,
-        role: req.body.role
-      },
-      { new: true }
-    )
-    .then(tag => {
-      if (!tag) {
-        return res.status(404).send({
-          message: "tag not found with id " + req.params.Id
-        });
-      }
-      res.send(tag);
-    })
-    .catch(err => {
-      if (err.kind === "ObjectId") {
-        return res.status(404).send({
-          message: "tag not found with id " + req.params.Id
-        });
-      }
-      return res.status(500).send({
-        message: "Error updating tag with id " + req.params.Id
+  if (req.body.trashstatus == 2) {
+    rc_tag
+      .findById(req.params.tagId).then(tag_del => {
+        tag_del.trashstatus = 0;
+        tag_del.save();
+        res.send({ message: "tag undo trashed successfully!" });
       });
-    });
+  } else {
+    rc_tag
+      .findByIdAndUpdate(
+        req.params.tagId,
+        {
+          tagtitle: req.body.tagtitle || "Untitled tag",
+          priority: req.body.priority,
+          role: req.body.role
+        },
+        { new: true }
+      )
+      .then(tag => {
+        if (!tag) {
+          return res.status(404).send({
+            message: "tag not found with id " + req.params.Id
+          });
+        }
+        res.send(tag);
+      })
+      .catch(err => {
+        if (err.kind === "ObjectId") {
+          return res.status(404).send({
+            message: "tag not found with id " + req.params.Id
+          });
+        }
+        return res.status(500).send({
+          message: "Error updating tag with id " + req.params.Id
+        });
+      });
+  }
 };
 
 // Delete a rc_tag with the specified Id in the request
 exports.delete = (req, res) => {
   rc_tag
-    .findOneAndDelete(req.params.tagId)
-    .then(rc_tag => {
-      if (!rc_tag) {
-        return res.status(404).send({
-          message: "tag not found with id " + req.params.Id
-        });
+    .findById(req.params.tagId).then(tag_del => {
+      if (tag_del.trashstatus == 1) {
+        tag_del.remove().then(tag => {
+          // rc_tag
+          //   .findOneAndDelete(req.params.tagId)
+          // .then(tag => {
+          if (!tag) {
+            return res.status(404).send({
+              message: "tag not found with id " + req.params.Id
+            });
+          }
+          res.send({ message: "tag deleted successfully!" });
+        })
+          .catch(err => {
+            if (err.kind === "ObjectId" || err.name === "NotFound") {
+              return res.status(404).send({
+                message: "tag not found with id " + req.params.Id
+              });
+            }
+            return res.status(500).send({
+              message: "Could not delete tag with id " + req.params.Id
+            });
+          });
+      } else {
+        tag_del.trashstatus = 1;
+        tag_del.save();
+        res.send({ message: "tag trashed successfully!" });
       }
-      res.send({ message: "tag deleted successfully!" });
-    })
-    .catch(err => {
-      if (err.kind === "ObjectId" || err.name === "NotFound") {
-        return res.status(404).send({
-          message: "tag not found with id " + req.params.Id
-        });
-      }
-      return res.status(500).send({
-        message: "Could not delete tag with id " + req.params.Id
-      });
     });
 };
+

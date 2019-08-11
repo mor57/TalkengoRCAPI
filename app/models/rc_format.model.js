@@ -8,7 +8,8 @@ const rc_formatSchema = mongoose.Schema(
     formattitle: String,
     type: String,
     priority: Number,
-    role: String
+    role: String,
+    trashstatus: Number,
   },
   // {
   //   toJSON: {

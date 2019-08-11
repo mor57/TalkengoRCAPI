@@ -113,66 +113,75 @@ exports.update = (req, res) => {
     });
   }
   // Find rc_resource and update it with the request body
-  rc_resource
-    .findByIdAndUpdate(
-      req.params.resourceId,
-      {
-        resourcetitle: req.body.resourcetitle || "Untitled resource",
-        type: req.body.type,
-        typestr: req.body.typestr,
-        access: req.body.access,
-        accesspermission: req.body.accesspermission,
-        subject: req.body.subject,
-        description: req.body.description,
-        priority: req.body.priority,
-        role: req.body.role,
-      },
-      { new: true }
-    )
-    .then(resource => {
-      if (!resource) {
-        return res.status(404).send({
-          message: "resource not found with id " + req.params.Id
-        });
-      }
-      resource.levels = [];
-      req.body.levels.forEach(level => {
-        resource.levels.push(level);
+  if (req.body.trashstatus == 2) {
+    rc_resource
+      .findById(req.params.resourceId).then(resource_del => {
+        resource_del.trashstatus = 0;
+        resource_del.save();
+        res.send({ message: "resource undo trashed successfully!" });
       });
-      resource.tags = [];
-      req.body.tags.forEach(tag => {
-        resource.tags.push(tag);
-      });
-      resource.cats = [];
-      req.body.cats.forEach(cat => {
-        resource.cats.push(cat);
-      });
-      resource.topics = [];
-      req.body.topics.forEach(topic => {
-        resource.topics.push(topic);
-      });
-      resource
-        .save()
-        .then(data => {
-          res.send(data);
-        })
-        .catch(err => {
-          res.status(500).send({
-            message: err.message || "Some error occurred while creating the resource."
+  } else {
+    rc_resource
+      .findByIdAndUpdate(
+        req.params.resourceId,
+        {
+          resourcetitle: req.body.resourcetitle || "Untitled resource",
+          type: req.body.type,
+          typestr: req.body.typestr,
+          access: req.body.access,
+          accesspermission: req.body.accesspermission,
+          subject: req.body.subject,
+          description: req.body.description,
+          priority: req.body.priority,
+          role: req.body.role,
+        },
+        { new: true }
+      )
+      .then(resource => {
+        if (!resource) {
+          return res.status(404).send({
+            message: "resource not found with id " + req.params.Id
           });
+        }
+        resource.levels = [];
+        req.body.levels.forEach(level => {
+          resource.levels.push(level);
         });
-      // res.send(resource);
-    })
-    .catch(err => {
-      if (err.kind === "ObjectId") {
-        return res.status(404).send({
-          message: "resource not found with id " + req.params.Id
+        resource.tags = [];
+        req.body.tags.forEach(tag => {
+          resource.tags.push(tag);
         });
-      }
-      return res.status(500).send({
-        message: "Error updating resource with id " + req.params.Id
+        resource.cats = [];
+        req.body.cats.forEach(cat => {
+          resource.cats.push(cat);
+        });
+        resource.topics = [];
+        req.body.topics.forEach(topic => {
+          resource.topics.push(topic);
+        });
+        resource
+          .save()
+          .then(data => {
+            res.send(data);
+          })
+          .catch(err => {
+            res.status(500).send({
+              message: err.message || "Some error occurred while creating the resource."
+            });
+          });
+        // res.send(resource);
+      })
+      .catch(err => {
+        if (err.kind === "ObjectId") {
+          return res.status(404).send({
+            message: "resource not found with id " + req.params.Id
+          });
+        }
+        return res.status(500).send({
+          message: "Error updating resource with id " + req.params.Id
+        });
       });
-    });
+  }
 };
 
 // Update a rc_resource identified by the Id in the request
@@ -215,23 +224,32 @@ exports.updateFile = (req, res) => {
 // Delete a rc_resource with the specified Id in the request
 exports.delete = (req, res) => {
   rc_resource
-    .findOneAndDelete(req.params.resourceId)
-    .then(rc_resource => {
-      if (!rc_resource) {
-        return res.status(404).send({
-          message: "resource not found with id " + req.params.Id
-        });
+    .findById(req.params.resourceId).then(resource_del => {
+      if (resource_del.trashstatus == 1) {
+        rc_resource
+          .findOneAndDelete(req.params.resourceId)
+          .then(rc_resource => {
+            if (!rc_resource) {
+              return res.status(404).send({
+                message: "resource not found with id " + req.params.Id
+              });
+            }
+            res.send({ message: "resource deleted successfully!" });
+          })
+          .catch(err => {
+            if (err.kind === "ObjectId" || err.name === "NotFound") {
+              return res.status(404).send({
+                message: "resource not found with id " + req.params.Id
+              });
+            }
+            return res.status(500).send({
+              message: "Could not delete resource with id " + req.params.Id
+            });
+          });
+      } else {
+        resource_del.trashstatus = 1;
+        resource_del.save();
+        res.send({ message: "resource trashed successfully!" });
       }
-      res.send({ message: "resource deleted successfully!" });
-    })
-    .catch(err => {
-      if (err.kind === "ObjectId" || err.name === "NotFound") {
-        return res.status(404).send({
-          message: "resource not found with id " + req.params.Id
-        });
-      }
-      return res.status(500).send({
-        message: "Could not delete resource with id " + req.params.Id
-      });
     });
 };

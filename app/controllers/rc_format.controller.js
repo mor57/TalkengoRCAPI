@@ -94,57 +94,75 @@ exports.update = (req, res) => {
     });
   }
   // Find rc_format and update it with the request body
-  rc_format
-    .findByIdAndUpdate(
-      req.params.formatId,
-      {
-        formattitle: req.body.formattitle || "Untitled format",
-        type: req.body.type,
-        priority: req.body.priority,
-        role: req.body.role
-      },
-      { new: true }
-    )
-    .then(format => {
-      if (!format) {
-        return res.status(404).send({
-          message: "format not found with id " + req.params.Id
-        });
-      }
-      res.send(format);
-    })
-    .catch(err => {
-      if (err.kind === "ObjectId") {
-        return res.status(404).send({
-          message: "format not found with id " + req.params.Id
-        });
-      }
-      return res.status(500).send({
-        message: "Error updating format with id " + req.params.Id
+  if (req.body.trashstatus == 2) {
+    rc_format
+      .findById(req.params.formatId).then(format_del => {
+        format_del.trashstatus = 0;
+        format_del.save();
+        res.send({ message: "format undo trashed successfully!" });
       });
-    });
+  } else {
+    rc_format
+      .findByIdAndUpdate(
+        req.params.formatId,
+        {
+          formattitle: req.body.formattitle || "Untitled format",
+          type: req.body.type,
+          priority: req.body.priority,
+          role: req.body.role
+        },
+        { new: true }
+      )
+      .then(format => {
+        if (!format) {
+          return res.status(404).send({
+            message: "format not found with id " + req.params.Id
+          });
+        }
+        res.send(format);
+      })
+      .catch(err => {
+        if (err.kind === "ObjectId") {
+          return res.status(404).send({
+            message: "format not found with id " + req.params.Id
+          });
+        }
+        return res.status(500).send({
+          message: "Error updating format with id " + req.params.Id
+        });
+      });
+  }
 };
 
 // Delete a rc_format with the specified Id in the request
 exports.delete = (req, res) => {
   rc_format
-    .findOneAndDelete(req.params.formatId)
-    .then(rc_format => {
-      if (!rc_format) {
-        return res.status(404).send({
-          message: "format not found with id " + req.params.Id
-        });
+    .findById(req.params.formatId).then(format_del => {
+      if (format_del.trashstatus == 1) {
+        // rc_format
+        //   .findOneAndDelete(req.params.formatId)
+        format_del.remove().then(format => {
+          if (!format) {
+            return res.status(404).send({
+              message: "format not found with id " + req.params.Id
+            });
+          }
+          res.send({ message: "format deleted successfully!" });
+        })
+          .catch(err => {
+            if (err.kind === "ObjectId" || err.name === "NotFound") {
+              return res.status(404).send({
+                message: "format not found with id " + req.params.Id
+              });
+            }
+            return res.status(500).send({
+              message: "Could not delete format with id " + req.params.Id
+            });
+          });
+      } else {
+        format_del.trashstatus = 1;
+        format_del.save();
+        res.send({ message: "format trashed successfully!" });
       }
-      res.send({ message: "format deleted successfully!" });
-    })
-    .catch(err => {
-      if (err.kind === "ObjectId" || err.name === "NotFound") {
-        return res.status(404).send({
-          message: "format not found with id " + req.params.Id
-        });
-      }
-      return res.status(500).send({
-        message: "Could not delete format with id " + req.params.Id
-      });
     });
 };

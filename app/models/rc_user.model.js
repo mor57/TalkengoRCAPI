@@ -28,6 +28,7 @@ const rc_userSchema = Schema(
     role: {
       type: String
     }
+    // , levels: [String]
     // ,
     // fn: {
     //   type: String,

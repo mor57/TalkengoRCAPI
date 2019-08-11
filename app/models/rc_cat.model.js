@@ -8,7 +8,8 @@ const rc_catSchema = mongoose.Schema(
     cattitle: String,
     type: String,
     priority: Number,
-    role: String
+    role: String,
+    trashstatus: Number,
   },
   // {
   //   toJSON: {

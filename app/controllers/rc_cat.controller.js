@@ -94,57 +94,75 @@ exports.update = (req, res) => {
     });
   }
   // Find rc_cat and update it with the request body
-  rc_cat
-    .findByIdAndUpdate(
-      req.params.catId,
-      {
-        cattitle: req.body.cattitle || "Untitled cat",
-        type: req.body.type,
-        priority: req.body.priority,
-        role: req.body.role
-      },
-      { new: true }
-    )
-    .then(cat => {
-      if (!cat) {
-        return res.status(404).send({
-          message: "cat not found with id " + req.params.Id
-        });
-      }
-      res.send(cat);
-    })
-    .catch(err => {
-      if (err.kind === "ObjectId") {
-        return res.status(404).send({
-          message: "cat not found with id " + req.params.Id
-        });
-      }
-      return res.status(500).send({
-        message: "Error updating cat with id " + req.params.Id
+  if (req.body.trashstatus == 2) {
+    rc_cat
+      .findById(req.params.catId).then(cat_del => {
+        cat_del.trashstatus = 0;
+        cat_del.save();
+        res.send({ message: "cat undo trashed successfully!" });
       });
-    });
+  } else {
+    rc_cat
+      .findByIdAndUpdate(
+        req.params.catId,
+        {
+          cattitle: req.body.cattitle || "Untitled cat",
+          type: req.body.type,
+          priority: req.body.priority,
+          role: req.body.role
+        },
+        { new: true }
+      )
+      .then(cat => {
+        if (!cat) {
+          return res.status(404).send({
+            message: "cat not found with id " + req.params.Id
+          });
+        }
+        res.send(cat);
+      })
+      .catch(err => {
+        if (err.kind === "ObjectId") {
+          return res.status(404).send({
+            message: "cat not found with id " + req.params.Id
+          });
+        }
+        return res.status(500).send({
+          message: "Error updating cat with id " + req.params.Id
+        });
+      });
+  }
 };
 
 // Delete a rc_cat with the specified Id in the request
 exports.delete = (req, res) => {
   rc_cat
-    .findOneAndDelete(req.params.catId)
-    .then(rc_cat => {
-      if (!rc_cat) {
-        return res.status(404).send({
-          message: "cat not found with id " + req.params.Id
-        });
+    .findById(req.params.catId).then(cat_del => {
+      if (cat_del.trashstatus == 1) {
+        // rc_cat
+        //   .findOneAndDelete(req.params.catId)
+        cat_del.remove().then(cat => {
+          if (!cat) {
+            return res.status(404).send({
+              message: "cat not found with id " + req.params.Id
+            });
+          }
+          res.send({ message: "cat deleted successfully!" });
+        })
+          .catch(err => {
+            if (err.kind === "ObjectId" || err.name === "NotFound") {
+              return res.status(404).send({
+                message: "cat not found with id " + req.params.Id
+              });
+            }
+            return res.status(500).send({
+              message: "Could not delete cat with id " + req.params.Id
+            });
+          });
+      } else {
+        cat_del.trashstatus = 1;
+        cat_del.save();
+        res.send({ message: "cat trashed successfully!" });
       }
-      res.send({ message: "cat deleted successfully!" });
-    })
-    .catch(err => {
-      if (err.kind === "ObjectId" || err.name === "NotFound") {
-        return res.status(404).send({
-          message: "cat not found with id " + req.params.Id
-        });
-      }
-      return res.status(500).send({
-        message: "Could not delete cat with id " + req.params.Id
-      });
     });
 };

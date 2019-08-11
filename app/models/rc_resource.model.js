@@ -19,7 +19,8 @@ const rc_resourceSchema = mongoose.Schema(
     subject: String,
     description: String,
     priority: Number,
-    role: String
+    role: String,
+    trashstatus: Number,
   },
   // {
   //   toJSON: {

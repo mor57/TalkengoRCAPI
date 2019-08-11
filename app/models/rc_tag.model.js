@@ -7,7 +7,8 @@ const rc_tagSchema = mongoose.Schema(
   {
     tagtitle: String,
     priority: Number,
-    role: String
+    role: String,
+    trashstatus: Number,
   },
   // {
   //   toJSON: {
