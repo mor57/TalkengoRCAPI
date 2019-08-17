@@ -21,6 +21,10 @@ const rc_resourceSchema = mongoose.Schema(
     priority: Number,
     role: String,
     trashstatus: Number,
+    visitors: [{ type: String }],
+    usagecount: Number,
+    raters: [{ type: String }],
+    rate_sum: Number
   },
   // {
   //   toJSON: {

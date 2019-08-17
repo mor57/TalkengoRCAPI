@@ -32,6 +32,13 @@ module.exports = app => {
     rc_resource.update
   );
 
+  // Update a rc_resource visitor with resourceId ,authorize
+  app.put(
+    "/rc_resource/:resourceId/:userid",
+    passport.authenticate("jwt", { session: false }),
+    rc_resource.updateVisit
+  );
+
   // Delete a rc_resource with resourceId ,authorize
   app.delete(
     "/rc_resource/:resourceId",

@@ -254,3 +254,69 @@ exports.delete = (req, res) => {
       }
     });
 };
+
+
+// Update visit a rc_resource identified by the Id in the request
+exports.updateVisit = (req, res) => {
+  // Validate Request
+  if (!req.params.resourceId) {
+    return res.status(400).send({
+      message: "Id can not be empty"
+    });
+  }
+  // if (!req.params.userid) {
+  //   return res.status(400).send({
+  //     message: "authentication is required"
+  //   });
+  // }
+  // Find rc_resource and update it with the request body
+  rc_resource
+    .findById(req.params.resourceId)
+    .then(resource => {
+      if (!resource) {
+        return res.status(404).send({
+          message: "resource not found with id " + req.params.resourceId
+        });
+      } else {
+        if (!req.body.rate) {
+          var visited = resource.visitors.filter(function (event) { return event == req.params.userid });
+          if (visited.length === 0) {
+            resource.visitors.push(req.params.userid);
+          }
+          if (resource.usagecount === undefined) {
+            resource.usagecount = 0;
+          }
+          resource.usagecount += 1;
+        } else {
+          var raters = resource.raters.filter(function (event) { return event == req.params.userid });
+          if (raters.length === 0) {
+            resource.raters.push(req.params.userid);
+            if (resource.rate_sum === undefined) {
+              resource.rate_sum = 0;
+            }
+            resource.rate_sum += req.body.ratevalue;
+          }
+        }
+        resource
+          .save()
+          .then(data => {
+            res.send(data);
+          })
+          .catch(err => {
+            res.status(500).send({
+              message: err.message || "Some error occurred while creating the resource."
+            });
+          });
+      }
+    })
+    .catch(err => {
+      if (err.kind === "ObjectId") {
+        return res.status(404).send({
+          message: "resource not found with id " + req.params.Id
+        });
+      }
+      return res.status(500).send({
+        message: "Error updating resource with id " + req.params.Id
+      });
+    });
+};
