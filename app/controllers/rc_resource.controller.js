@@ -286,7 +286,9 @@ exports.updateVisit = (req, res) => {
           if (resource.usagecount === undefined) {
             resource.usagecount = 0;
           }
-          resource.usagecount += 1;
+          if (!req.body.visited) {
+            resource.usagecount += 1;
+          }
         } else {
           var raters = resource.raters.filter(function (event) { return event == req.params.userid });
           if (raters.length === 0) {

@@ -1,5 +1,4 @@
-# recorded videos
-resources/recorded_videos/
+rc_uploads
 
 # ignore .DS_Store
 .DS_Store
