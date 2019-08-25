@@ -13,7 +13,7 @@ git-workflow
 node_modules
 
 # ignore upload folder commit
-resources/uploaded
+resources/rc_uploads
 
 # ignore package-lock.json
 package-lock.json
