@@ -14,7 +14,7 @@ module.exports = app => {
   // Retrieve all rc_cat ,authorize
   app.get(
     "/rc_cat",
-    passport.authenticate("jwt", { session: false }),
+    // passport.authenticate("jwt", { session: false }),
     rc_cat.findAll
   );
 
