@@ -3,22 +3,22 @@ const mongoose = require("mongoose");
 // var Schema = mongoose.Schema;
 // var Types = mongoose.Schema.Types;
 
-const rc_formatSchema = mongoose.Schema(
-  {
-    formattitle: String,
-    type: String,
-    priority: Number,
-    role: String,
-    trashstatus: Number,
-  },
-  // {
-  //   toJSON: {
-  //     virtuals: true
-  //   }
-  // },
-  {
-    timestamps: true
-  }
+const rc_formatSchema = mongoose.Schema({
+        formattitle: String,
+        type: String,
+        priority: Number,
+        role: String,
+        trashstatus: Number,
+        resourceCount: Number
+    },
+    // {
+    //   toJSON: {
+    //     virtuals: true
+    //   }
+    // },
+    {
+        timestamps: true
+    }
 );
 
 // module.exports = mongoose.model("rc_format", rc_formatSchema);

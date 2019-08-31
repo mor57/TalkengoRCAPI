@@ -18,6 +18,13 @@ module.exports = app => {
         rc_tag.findAll
     );
 
+    // Retrieve all rc_tag with resource count ,authorize
+    app.get(
+        "/rc_tag/hasresource/:role",
+        // passport.authenticate("jwt", { session: false }),
+        rc_tag.findAllHasresource
+    );
+
     // Retrieve a single rc_tag with tagId ,authorize
     app.get(
         "/rc_tag/:tagId",

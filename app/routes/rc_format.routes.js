@@ -18,6 +18,13 @@ module.exports = app => {
         rc_format.findAll
     );
 
+    // Retrieve all rc_tag with resource count ,authorize
+    app.get(
+        "/rc_format/hasresource/:role",
+        // passport.authenticate("jwt", { session: false }),
+        rc_format.findAllHasresource
+    );
+
     // Retrieve a single rc_format with formatId ,authorize
     app.get(
         "/rc_format/:formatId",
